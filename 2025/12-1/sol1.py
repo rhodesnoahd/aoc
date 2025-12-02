@@ -13,8 +13,7 @@ for line in lines:
     amount = int(line[1:].strip())
 
     if line[0] == "L":
-        # dial = (dial + (100 - amount)) % 100
-        dial = (100 - amount + dial) % 100
+        dial = (dial + (100 - amount)) % 100
 
     elif line[0] == "R":
         dial = (dial + amount) % 100
