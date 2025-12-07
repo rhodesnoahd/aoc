@@ -1,7 +1,7 @@
 import os
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
-input_file_path = os.path.join(script_dir, "input.txt")
+input_file_path = os.path.join(script_dir, "test.txt")
 with open(input_file_path, "r") as file:
     lines = file.readlines()
 
