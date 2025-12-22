@@ -46,35 +46,40 @@ def backtrack(coef, mem, n):
     if n >= depth:
         return False
 
-    # current highest joltage requirement (hirq) order
-    cmji, hirq, tmp = 0, [], _jolts[:]
+    # ascending joltage
+    cmji, aj, tmp = float("inf"), [], _jolts[:]
     for i in range(len(tmp)):
-        imax = tmp.index(max(tmp))
+        imin = tmp.index(min(tmp))
         if i == 0:
-            cmji = imax
-        hirq.append(imax)
-        tmp[imax] *= -1
+            cmji = imin
+        aj.append(imin)
+        tmp[imin] = float("inf")
 
-    # remove buttons that would not decrease current max joltage if pressed
-    # sort buttons by _merq to determine coef assignment order
+    # remove buttons that would produce invalid results if pressed any number of times
+    # sort buttons by _cmji, _merq, _tjolts, to determine coef assignment order
     _btns = []
     for i in range(len(btns)):
-        _cmji, _merq = False, ["1"] * len(hirq)
+        valid, _cmji = True, "1"
+        _tjolts, _merq = 0, ["1"] * len(aj)
         for j in btns[i]:
+            if _jolts[j] == 0:
+                valid = False
+                break
             if j == cmji:
-                _cmji = True
-            if j in hirq:  # huh
-                rq = hirq.index(j)
+                _cmji = "0"
+            if _jolts[j] > 0:
+                _tjolts -= 1
+            if j in aj:  # huh
+                rq = aj.index(j)
                 _merq[rq] = "0"
-        if _cmji:
-            heapq.heappush(_btns, ("".join(_merq), i))
+        if valid:
+            heapq.heappush(_btns, (_cmji, "".join(_merq), _tjolts, i))
 
     while _btns:
-        b = heapq.heappop(_btns)
-        bi = b[1]
+        _cmji, _merq, _tjolts, bi = heapq.heappop(_btns)
         _btn = btns[bi]
 
-        # start assignment w min jolts button would effect
+        # start assignment w min jolt button would effect
         mjbp = float("inf")
         for i in _btn:
             mjbp = min(mjbp, _jolts[i])
@@ -84,17 +89,17 @@ def backtrack(coef, mem, n):
             # perform assignment
             coef[bi] = val
             _jolts = tuple(updateJolts(coef))
-            consistent = len(_jolts) != 0
+            consistent = len(_jolts) != 0 and tuple(coef) not in mem
 
-            if consistent and _jolts not in mem:
-                mem.add(_jolts)
+            if consistent:
+                mem.add(tuple(coef))
                 if backtrack(coef, mem, n + 1):
                     return True
 
             # backtrack
             coef[bi] = -1
-            if _jolts in mem:
-                mem.remove(_jolts)
+            if tuple(coef) in mem:
+                mem.remove(tuple(coef))
 
     return False
 
@@ -117,7 +122,8 @@ for l in m:
     jolts = tuple(map(int, mach[-1][1 : len(mach[-1]) - 1].split(",")))
 
     # search
-    depth = int((max(jolts) + 3) * 1.25)
+    # depth = int((max(jolts) + 3) * 1.75)
+    depth = 997
     sols = []
     coef = [-1] * len(btns)
     backtrack(coef, set(), 0)
