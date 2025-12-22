@@ -49,7 +49,7 @@ def backtrack(lights, n, stack):
         if stack:
             stack.pop()
 
-    return False
+    return
 
 
 start_time = time.perf_counter()
