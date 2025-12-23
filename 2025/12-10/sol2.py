@@ -46,7 +46,7 @@ def backtrack(coef, mem, n):
     if n >= depth:
         return False
 
-    # ascending joltage
+    # sort by ascending joltage
     cmji, aj, tmp = float("inf"), [], _jolts[:]
     for i in range(len(tmp)):
         imin = tmp.index(min(tmp))
@@ -56,7 +56,7 @@ def backtrack(coef, mem, n):
         tmp[imin] = float("inf")
 
     # remove buttons that would produce invalid results if pressed any number of times
-    # sort buttons by _cmji, _merq, _tjolts, to determine coef assignment order
+    # sort buttons by _merq, _tjolts, to determine coef assignment order
     _btns = []
     for i in range(len(btns)):
         valid, _cmji = True, "1"
@@ -73,10 +73,10 @@ def backtrack(coef, mem, n):
                 rq = aj.index(j)
                 _merq[rq] = "0"
         if valid:
-            heapq.heappush(_btns, (_cmji, "".join(_merq), _tjolts, i))
+            heapq.heappush(_btns, ("".join(_merq), _tjolts, i))
 
     while _btns:
-        _cmji, _merq, _tjolts, bi = heapq.heappop(_btns)
+        _merq, _tjolts, bi = heapq.heappop(_btns)
         _btn = btns[bi]
 
         # start assignment w min jolt button would effect
@@ -122,7 +122,6 @@ for l in m:
     jolts = tuple(map(int, mach[-1][1 : len(mach[-1]) - 1].split(",")))
 
     # search
-    # depth = int((max(jolts) + 3) * 1.75)
     depth = 997
     sols = []
     coef = [-1] * len(btns)
