@@ -21,7 +21,7 @@ def updateLights(b, lights):
     return "".join(_lights)
 
 
-def backtrack(lights, n, stack):
+def backtrack(lights, n, stack, mem):
     global btns
     global sols
 
@@ -34,7 +34,7 @@ def backtrack(lights, n, stack):
         return
 
     # remove btns already pressed in this sol
-    _btns = [b for b in btns if b not in stack]
+    _btns = [b for b in btns if b not in mem]
 
     while _btns:
         b = _btns.pop()
@@ -43,11 +43,14 @@ def backtrack(lights, n, stack):
         if not sols or (sols and sols[0][0] > n + 1):
             _lights = updateLights(b, lights)
             stack.append(b)
-            backtrack(_lights, n + 1, stack)
+            mem.add(b)
+            backtrack(_lights, n + 1, stack, mem)
 
         # backtrack
         if stack:
             stack.pop()
+        if b in mem:
+            mem.remove(b)
 
     return
 
@@ -63,7 +66,7 @@ for l in m:
         btns[i] = tuple(map(int, b.split(",")))
 
     sols = []
-    backtrack(lights, 0, [])
+    backtrack(lights, 0, [], set())
     ans += heapq.heappop(sols)[0]
 
 print(ans)
