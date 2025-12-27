@@ -11,29 +11,33 @@ with open(input_file_path, "r") as file:
         d[key] = tuple(word[1:])
 
 
-# part 1 solution
-def dfs(path, mem):
-    if path[-1] in mem:
-        return mem[path[-1]]
+# part 2 solution
+def dfs(path, mem, mem2):
+    if (len(mem2), path[-1]) in mem:
+        return mem[len(mem2), path[-1]]
 
     if path[-1] == "out":
-        return 1
+        return 1 if len(mem2) == 2 else 0
 
     if path[-1] in d:
         for device in d[path[-1]]:
             path.append(device)
-            tmp = dfs(path, mem)
+            if device == "fft" or device == "dac":
+                mem2.add(device)
+            tmp = dfs(path, mem, mem2)
             path.pop()
-            if path[-1] in mem:
-                mem[path[-1]] += tmp
+            if device == "fft" or device == "dac":
+                mem2.remove(device)
+            if (len(mem2), path[-1]) in mem:
+                mem[(len(mem2), path[-1])] += tmp
             else:
-                mem[path[-1]] = tmp
-        return mem[path[-1]]
+                mem[(len(mem2), path[-1])] = tmp
+        return mem[(len(mem2), path[-1])]
 
 
 start_time = time.perf_counter()
 
-ans = dfs(["you"], {})
+ans = dfs(["svr"], {}, set())
 
 print(ans)
 
